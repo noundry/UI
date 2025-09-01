@@ -10,7 +10,7 @@ A modern C# ASP.NET TagHelper library that provides server-side components with 
 
 ## ✨ Features
 
-- **🎯 62 UI Components** - Complete set of interactive components
+- **🎯 63 UI Components** - Complete set of interactive components
 - **🔗 Full Model Binding** - Seamless ASP.NET model binding support  
 - **♿ Accessibility Ready** - ARIA attributes and keyboard navigation
 - **🎨 Tailwind CSS Integration** - Beautiful, consistent styling
@@ -103,10 +103,10 @@ builder.Services.AddNoundryUI(options =>
 - **Tooltip** - Hover information display
 - **Popover** - Click-activated content overlay
 
-### Data Display (23 TagHelpers)
+### Data Display (24 TagHelpers)
 - **Card** - Content containers with header/body/footer (4 TagHelpers)
 - **Table** - Data tables with sorting and responsive design (6 TagHelpers)
-- **Data Table** - Advanced data tables with API, pagination, sorting (4 TagHelpers)
+- **Data Table** - Advanced data tables with API, pagination, sorting, expandable rows (5 TagHelpers)
 - **Pagination** - Page navigation with ranges
 - **Copy to Clipboard** - Text copy functionality
 - **Skeleton** - Loading state placeholders with animations (5 TagHelpers)
@@ -203,6 +203,12 @@ builder.Services.AddNoundryUI(options =>
     <noundry-data-table-column key="name" label="Name" sortable="true" href="/users/{id}" />
     <noundry-data-table-column key="email" label="Email" sortable="true" />
     <noundry-data-table-column key="role" label="Role" sortable="false" />
+    
+    <!-- Expandable rows with slide-down animation -->
+    <noundry-data-table-expandable-row 
+        api-url="/api/users/{id}/details"
+        button-text="View Details"
+        api-parameters="include=profile,settings" />
 </noundry-data-table>
 
 <!-- Model-bound data table -->

@@ -219,7 +219,7 @@ public class DataTableTagHelper : NoundryTagHelperBase
                     <tbody class=""bg-white divide-y divide-gray-200"">
                         <template x-if=""loading"">
                             <tr>
-                                <td :colspan=""columns.length"" class=""px-6 py-12 text-center"">
+                                <td :colspan=""columns.length{(dataTableContext.ExpandableRow != null ? " + 1" : "")}"" class=""px-6 py-12 text-center"">
                                     <div class=""flex justify-center"">
                                         {loadingSpinner}
                                     </div>
@@ -228,35 +228,92 @@ public class DataTableTagHelper : NoundryTagHelperBase
                         </template>
                         <template x-if=""!loading && error"">
                             <tr>
-                                <td :colspan=""columns.length"" class=""px-6 py-8 text-center text-red-500"">
+                                <td :colspan=""columns.length{(dataTableContext.ExpandableRow != null ? " + 1" : "")}"" class=""px-6 py-8 text-center text-red-500"">
                                     <span x-text=""error""></span>
                                 </td>
                             </tr>
                         </template>
                         <template x-if=""!loading && !error && filteredData.length === 0"">
                             <tr>
-                                <td :colspan=""columns.length"" class=""px-6 py-8 text-center text-gray-500"">
+                                <td :colspan=""columns.length{(dataTableContext.ExpandableRow != null ? " + 1" : "")}"" class=""px-6 py-8 text-center text-gray-500"">
                                     {EscapeJavaScriptString(NoResultsMessage)}
                                 </td>
                             </tr>
                         </template>
                         <template x-for=""(item, index) in paginatedData"" :key=""index"">
-                            <tr class=""{(Hoverable ? "hover:bg-gray-50" : "")} {(Striped ? "even:bg-gray-50" : "")}"">
-                                <template x-for=""column in columns"" :key=""column.key"">
-                                    <td class=""px-6 py-4 whitespace-nowrap text-sm text-gray-800"">
-                                        <template x-if=""column.href"">
-                                            <a 
-                                                :href=""formatHref(column.href, item)"" 
-                                                class=""text-primary-600 hover:text-primary-800 hover:underline""
-                                                x-text=""column.hrefText ? formatHref(column.hrefText, item) : getNestedValue(item, column.key)""
-                                            ></a>
-                                        </template>
-                                        <template x-if=""!column.href"">
-                                            <span x-text=""getNestedValue(item, column.key)""></span>
-                                        </template>
+                            <template>
+                                <tr class=""{(Hoverable ? "hover:bg-gray-50" : "")} {(Striped ? "even:bg-gray-50" : "")}"">
+                                    {(dataTableContext.ExpandableRow != null ? $@"
+                                    <td class=""px-6 py-4 whitespace-nowrap text-sm text-gray-800 w-12"">
+                                        {(dataTableContext.ExpandableRow.ShowAsIcon ? $@"
+                                        <button 
+                                            @click=""toggleExpanded(index, item)""
+                                            class=""p-1 rounded-lg hover:bg-gray-100 transition-colors""
+                                            :class=""{{ 'text-primary-600': expandedRows[index], 'text-gray-400': !expandedRows[index] }}""
+                                        >
+                                            <svg class=""w-5 h-5 transform transition-transform""
+                                                 :class=""{{ 'rotate-180': expandedRows[index] }}""
+                                                 fill=""none"" stroke=""currentColor"" viewBox=""0 0 24 24"">
+                                                <path stroke-linecap=""round"" stroke-linejoin=""round"" stroke-width=""2"" d=""M19 9l-7 7-7-7"" />
+                                            </svg>
+                                        </button>
+                                        " : $@"
+                                        <button 
+                                            @click=""toggleExpanded(index, item)""
+                                            class=""inline-flex items-center px-3 py-1 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors""
+                                        >
+                                            <span x-text=""{EscapeJavaScriptString(dataTableContext.ExpandableRow.ButtonText)}""></span>
+                                            <svg class=""ml-1 w-4 h-4 transform transition-transform""
+                                                 :class=""{{ 'rotate-180': expandedRows[index] }}""
+                                                 fill=""none"" stroke=""currentColor"" viewBox=""0 0 24 24"">
+                                                <path stroke-linecap=""round"" stroke-linejoin=""round"" stroke-width=""2"" d=""M19 9l-7 7-7-7"" />
+                                            </svg>
+                                        </button>
+                                        ")}
                                     </td>
-                                </template>
-                            </tr>
+                                    " : "")}
+                                    <template x-for=""column in columns"" :key=""column.key"">
+                                        <td class=""px-6 py-4 whitespace-nowrap text-sm text-gray-800"">
+                                            <template x-if=""column.href"">
+                                                <a 
+                                                    :href=""formatHref(column.href, item)"" 
+                                                    class=""text-primary-600 hover:text-primary-800 hover:underline""
+                                                    x-text=""column.hrefText ? formatHref(column.hrefText, item) : getNestedValue(item, column.key)""
+                                                ></a>
+                                            </template>
+                                            <template x-if=""!column.href"">
+                                                <span x-text=""getNestedValue(item, column.key)""></span>
+                                            </template>
+                                        </td>
+                                    </template>
+                                </tr>
+                                {(dataTableContext.ExpandableRow != null ? $@"
+                                <tr x-show=""expandedRows[index]"" 
+                                    x-collapse
+                                    class=""bg-gray-50 border-t border-gray-200"">
+                                    <td :colspan=""columns.length + 1"" class=""px-6 py-4"">
+                                        <div class=""bg-white rounded-lg p-4 shadow-sm {EscapeJavaScriptString(dataTableContext.ExpandableRow.ContainerClass)}"">
+                                            <template x-if=""expandedContent[index] === 'loading'"">
+                                                <div class=""flex items-center justify-center py-8"">
+                                                    <div class=""flex items-center space-x-2"">
+                                                        <div class=""animate-spin rounded-full h-4 w-4 border-b-2 border-primary-600""></div>
+                                                        <span class=""text-gray-600"">{EscapeJavaScriptString(dataTableContext.ExpandableRow.LoadingText)}</span>
+                                                    </div>
+                                                </div>
+                                            </template>
+                                            <template x-if=""expandedContent[index] === 'error'"">
+                                                <div class=""text-center py-8 text-red-600"">
+                                                    <span>{EscapeJavaScriptString(dataTableContext.ExpandableRow.ErrorText)}</span>
+                                                </div>
+                                            </template>
+                                            <template x-if=""expandedContent[index] && expandedContent[index] !== 'loading' && expandedContent[index] !== 'error'"">
+                                                <div x-html=""expandedContent[index]""></div>
+                                            </template>
+                                        </div>
+                                    </td>
+                                </tr>
+                                " : "")}
+                            </template>
                         </template>
                     </tbody>
                 </table>
@@ -368,6 +425,13 @@ public class DataTableTagHelper : NoundryTagHelperBase
             .AddStringProperty("sortDirection", "asc")
             .AddProperty("totalRecords", 0)
             .AddBooleanProperty("serverPagination", ServerPagination);
+
+        // Add expandable row properties if feature is enabled
+        if (context.ExpandableRow != null)
+        {
+            builder.AddProperty("expandedRows", "{}")
+                   .AddProperty("expandedContent", "{}");
+        }
 
         // Computed properties
         builder.AddMethod("get totalPages() { return this.serverPagination ? Math.ceil(this.totalRecords / this.perPage) : Math.ceil(this.filteredData.length / this.perPage); }");
@@ -491,6 +555,44 @@ public class DataTableTagHelper : NoundryTagHelperBase
         // Utility methods
         builder.AddMethod("getNestedValue(obj, path) { return path.split('.').reduce((prev, curr) => { return prev && prev[curr] !== undefined ? prev[curr] : null; }, obj); }");
         builder.AddMethod("formatHref(template, item) { return template.replace(/{([^}]+)}/g, (match, key) => { return this.getNestedValue(item, key) || ''; }); }");
+
+        // Add expandable row methods if feature is enabled
+        if (context.ExpandableRow != null)
+        {
+            builder.AddMethod($@"async toggleExpanded(index, item) {{ 
+                if (this.expandedRows[index]) {{ 
+                    delete this.expandedRows[index]; 
+                    delete this.expandedContent[index]; 
+                    return; 
+                }} 
+                this.expandedRows = {{ ...this.expandedRows, [index]: true }}; 
+                this.expandedContent = {{ ...this.expandedContent, [index]: 'loading' }}; 
+                try {{ 
+                    let apiUrl = '{EscapeJavaScriptString(context.ExpandableRow.ApiUrl)}';
+                    {(!string.IsNullOrEmpty(context.ExpandableRow.ApiParameters) ? $@"
+                    let parameters = '{EscapeJavaScriptString(context.ExpandableRow.ApiParameters)}';
+                    parameters = parameters.replace(/{{([^}}]+)}}/g, (match, key) => {{ 
+                        return this.getNestedValue(item, key) || ''; 
+                    }});
+                    if (parameters) {{ 
+                        apiUrl += (apiUrl.includes('?') ? '&' : '?') + parameters; 
+                    }}
+                    " : "")}
+                    apiUrl = apiUrl.replace(/{{([^}}]+)}}/g, (match, key) => {{ 
+                        return this.getNestedValue(item, key) || ''; 
+                    }});
+                    const response = await fetch(apiUrl); 
+                    if (!response.ok) {{ 
+                        throw new Error(`HTTP error! Status: ${{response.status}}`); 
+                    }} 
+                    const content = await response.text(); 
+                    this.expandedContent = {{ ...this.expandedContent, [index]: content }}; 
+                }} catch (error) {{ 
+                    console.error('Error fetching expanded content:', error); 
+                    this.expandedContent = {{ ...this.expandedContent, [index]: 'error' }}; 
+                }} 
+            }}");
+        }
 
         return builder.Build();
     }
@@ -705,6 +807,8 @@ public class DataTableContext
     public string Size { get; set; } = "md";
     public List<DataTableColumn> Columns { get; set; } = new();
     public List<DataTableRow> StaticData { get; set; } = new();
+    public DataTableExpandableRow? ExpandableRow { get; set; }
+    public string? ExpandableRowTemplate { get; set; }
 }
 
 public class DataTableColumn
@@ -717,4 +821,93 @@ public class DataTableColumn
     public string? Width { get; set; }
     public string Align { get; set; } = "left";
     public bool Hidden { get; set; }
+}
+
+public class DataTableExpandableRow
+{
+    public string ApiUrl { get; set; } = string.Empty;
+    public string ButtonText { get; set; } = "View Details";
+    public string ButtonIcon { get; set; } = "chevron-down";
+    public string? ApiParameters { get; set; }
+    public bool ShowAsIcon { get; set; } = false;
+    public string LoadingText { get; set; } = "Loading...";
+    public string ErrorText { get; set; } = "Error loading details";
+    public string ContainerClass { get; set; } = "";
+}
+
+[HtmlTargetElement("noundry-data-table-expandable-row", ParentTag = "noundry-data-table")]
+public class DataTableExpandableRowTagHelper : NoundryTagHelperBase
+{
+    /// <summary>
+    /// API URL to fetch expanded content (supports placeholders like {id}, {name}, etc.)
+    /// </summary>
+    public string ApiUrl { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Text displayed on the expand button
+    /// </summary>
+    public string ButtonText { get; set; } = "View Details";
+
+    /// <summary>
+    /// Icon to display on the expand button (Heroicon name)
+    /// </summary>
+    public string ButtonIcon { get; set; } = "chevron-down";
+
+    /// <summary>
+    /// Additional parameters to pass to API (supports placeholders like {id}, {status}, etc.)
+    /// </summary>
+    public string? ApiParameters { get; set; }
+
+    /// <summary>
+    /// Whether to show only an icon instead of text button
+    /// </summary>
+    public bool ShowAsIcon { get; set; } = false;
+
+    /// <summary>
+    /// Text shown while loading expanded content
+    /// </summary>
+    public string LoadingText { get; set; } = "Loading...";
+
+    /// <summary>
+    /// Text shown when API call fails
+    /// </summary>
+    public string ErrorText { get; set; } = "Error loading details";
+
+    /// <summary>
+    /// CSS classes for the expanded content container
+    /// </summary>
+    public string ContainerClass { get; set; } = "";
+
+    public override async Task ProcessAsync(TagHelperContext context, TagHelperOutput output)
+    {
+        // Get the data table context
+        if (!context.Items.TryGetValue(typeof(DataTableContext), out var contextObj) || 
+            contextObj is not DataTableContext dataTableContext)
+        {
+            throw new InvalidOperationException("noundry-data-table-expandable-row must be used within a noundry-data-table");
+        }
+
+        // Store expandable row configuration in the context
+        dataTableContext.ExpandableRow = new DataTableExpandableRow
+        {
+            ApiUrl = ApiUrl,
+            ButtonText = ButtonText,
+            ButtonIcon = ButtonIcon,
+            ApiParameters = ApiParameters,
+            ShowAsIcon = ShowAsIcon,
+            LoadingText = LoadingText,
+            ErrorText = ErrorText,
+            ContainerClass = ContainerClass
+        };
+
+        // Get any custom template content
+        var content = await output.GetChildContentAsync();
+        if (!content.IsEmptyOrWhiteSpace)
+        {
+            dataTableContext.ExpandableRowTemplate = content.GetContent();
+        }
+
+        // This tag helper doesn't render anything directly
+        output.SuppressOutput();
+    }
 }

@@ -14,7 +14,8 @@
       "Read(/C:\\Temp/**)",
       "Read(/C:\\temp/**)",
       "Read(/C:\\temp/**)",
-      "Bash(chmod:*)"
+      "Bash(chmod:*)",
+      "Bash(git log:*)"
     ],
     "deny": [],
     "ask": []

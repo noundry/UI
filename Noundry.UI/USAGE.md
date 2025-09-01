@@ -398,6 +398,81 @@ Advanced data table with API support, pagination, sorting, and search.
     <noundry-data-table-column key="name" label="Name" />
     <noundry-data-table-column key="value" label="Value" />
 </noundry-data-table>
+
+<!-- Data table with expandable rows -->
+<noundry-data-table title="Users with Details" 
+                   api-url="/api/users"
+                   per-page="10"
+                   show-search="true">
+    <noundry-data-table-column key="id" label="ID" sortable="true" />
+    <noundry-data-table-column key="name" label="Name" sortable="true" />
+    <noundry-data-table-column key="email" label="Email" sortable="true" />
+    
+    <!-- Expandable row configuration -->
+    <noundry-data-table-expandable-row 
+        api-url="/api/users/{id}/details"
+        button-text="View Details"
+        loading-text="Loading user details..."
+        error-text="Failed to load details"
+        container-class="border border-gray-200" />
+</noundry-data-table>
+
+<!-- Icon-based expandable rows with API parameters -->
+<noundry-data-table title="Posts with Comments" 
+                   api-url="/api/posts">
+    <noundry-data-table-column key="id" label="ID" sortable="true" />
+    <noundry-data-table-column key="title" label="Title" sortable="true" />
+    
+    <!-- Icon-only expand button with API parameters -->
+    <noundry-data-table-expandable-row 
+        api-url="/api/posts/{id}/comments"
+        show-as-icon="true"
+        api-parameters="limit=5&include=author"
+        loading-text="Loading comments..."
+        error-text="Failed to load comments" />
+</noundry-data-table>
+```
+
+#### Data Table Expandable Row Features
+
+The `noundry-data-table-expandable-row` component adds slide-down functionality to data table rows:
+
+**Key Features:**
+- **API Integration**: Fetch content from server endpoints with placeholder substitution
+- **Smooth Animations**: Slide-down animations using Alpine.js x-collapse
+- **Parameter Support**: Pass additional API parameters with placeholder substitution
+- **Loading States**: Customizable loading and error messages
+- **Flexible UI**: Choose between button text or icon-only display
+- **Custom Styling**: Add CSS classes to the expanded content container
+
+**API URL Placeholders:**
+- Use `{propertyName}` in the API URL to substitute values from the row data
+- Example: `/api/users/{id}/details` where `{id}` gets replaced with the row's `id` value
+
+**API Parameters:**
+- Use the `api-parameters` attribute to add query parameters
+- Supports placeholders: `limit=5&userId={id}&status={status}`
+- Parameters are automatically URL-encoded
+
+**Usage Examples:**
+```html
+<!-- Button-style expand with custom text -->
+<noundry-data-table-expandable-row 
+    api-url="/api/orders/{orderId}/items"
+    button-text="View Items"
+    api-parameters="include=product&limit=10" />
+
+<!-- Icon-only expand button -->
+<noundry-data-table-expandable-row 
+    api-url="/api/customers/{customerId}/orders"
+    show-as-icon="true"
+    loading-text="Loading orders..." />
+
+<!-- Custom styling for expanded content -->
+<noundry-data-table-expandable-row 
+    api-url="/api/reports/{id}/data"
+    button-text="Show Report"
+    container-class="bg-blue-50 border-2 border-blue-200 rounded-lg" />
 ```
 
 ### Multi-Select
@@ -836,6 +911,18 @@ Used for static data in data tables. No properties - acts as a container for cel
 | Property | Type | Default | Description |
 |----------|------|---------|-------------|
 | `key` | string | required | Column key this cell belongs to |
+
+### Data Table Expandable Row (`noundry-data-table-expandable-row`)
+| Property | Type | Default | Description |
+|----------|------|---------|-------------|
+| `api-url` | string | required | API URL to fetch expanded content (supports placeholders like {id}, {name}) |
+| `button-text` | string | "View Details" | Text displayed on the expand button |
+| `button-icon` | string | "chevron-down" | Icon to display on the expand button (Heroicon name) |
+| `api-parameters` | string | null | Additional parameters to pass to API (supports placeholders) |
+| `show-as-icon` | bool | false | Whether to show only an icon instead of text button |
+| `loading-text` | string | "Loading..." | Text shown while loading expanded content |
+| `error-text` | string | "Error loading details" | Text shown when API call fails |
+| `container-class` | string | "" | CSS classes for the expanded content container |
 
 ### Multi-Select (`noundry-multi-select`)
 | Property | Type | Default | Description |

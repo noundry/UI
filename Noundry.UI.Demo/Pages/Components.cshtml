@@ -272,6 +272,57 @@
                 </noundry-data-table-row>
             </noundry-data-table>
         </div>
+        
+        <div class="mt-6">
+            <h3 class="text-lg font-medium mb-3">Data Table with Expandable Rows</h3>
+            <p class="text-sm text-gray-600 mb-4">
+                Click the expand button on each row to load additional details from the API. The expanded content slides down smoothly with a fade animation.
+            </p>
+            <noundry-data-table title="Users with Expandable Details" 
+                               api-url="https://jsonplaceholder.typicode.com/users"
+                               per-page="5"
+                               show-search="true"
+                               show-pagination="true"
+                               hoverable="true">
+                <noundry-data-table-column key="id" label="ID" sortable="true" />
+                <noundry-data-table-column key="name" label="Name" sortable="true" />
+                <noundry-data-table-column key="email" label="Email" sortable="true" />
+                <noundry-data-table-column key="username" label="Username" sortable="true" />
+                
+                <!-- Expandable row configuration -->
+                <noundry-data-table-expandable-row 
+                    api-url="https://jsonplaceholder.typicode.com/users/{id}/albums"
+                    button-text="Albums"
+                    show-as-icon="false"
+                    loading-text="Loading user albums..."
+                    error-text="Failed to load albums"
+                    container-class="border border-blue-200" />
+            </noundry-data-table>
+        </div>
+        
+        <div class="mt-6">
+            <h3 class="text-lg font-medium mb-3">Data Table with Icon Expandable Rows</h3>
+            <p class="text-sm text-gray-600 mb-4">
+                This example uses icon-only expand buttons and includes API parameters.
+            </p>
+            <noundry-data-table title="Posts with Comments" 
+                               api-url="https://jsonplaceholder.typicode.com/posts"
+                               per-page="3"
+                               show-search="true"
+                               hoverable="true">
+                <noundry-data-table-column key="id" label="ID" sortable="true" />
+                <noundry-data-table-column key="title" label="Title" sortable="true" />
+                <noundry-data-table-column key="userId" label="User ID" sortable="true" />
+                
+                <!-- Icon-based expandable row with API parameters -->
+                <noundry-data-table-expandable-row 
+                    api-url="https://jsonplaceholder.typicode.com/posts/{id}/comments"
+                    show-as-icon="true"
+                    api-parameters="limit=3"
+                    loading-text="Loading comments..."
+                    error-text="Failed to load comments" />
+            </noundry-data-table>
+        </div>
     </div>
 
     <!-- Skeleton Loading States -->
