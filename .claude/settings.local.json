@@ -13,7 +13,8 @@
       "Bash(timeout:*)",
       "Read(/C:\\Temp/**)",
       "Read(/C:\\temp/**)",
-      "Read(/C:\\temp/**)"
+      "Read(/C:\\temp/**)",
+      "Bash(chmod:*)"
     ],
     "deny": [],
     "ask": []

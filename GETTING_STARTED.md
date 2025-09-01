@@ -302,7 +302,7 @@ builder.Services.AddNoundryUI(options =>
 If you want to contribute or run the demo locally:
 
 ### Prerequisites
-- .NET 8.0 SDK
+- .NET 8.0 or 9.0 SDK
 - Node.js (for Tailwind CSS, optional)
 
 ### Clone and Run

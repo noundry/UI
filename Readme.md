@@ -1,7 +1,7 @@
 # Noundry UI
 
 ![Noundry UI](https://img.shields.io/badge/Noundry_UI-1.0.0-blue.svg)
-![.NET](https://img.shields.io/badge/.NET-8.0-purple.svg)
+![.NET](https://img.shields.io/badge/.NET-8.0%20%7C%209.0-purple.svg)
 ![Alpine.js](https://img.shields.io/badge/Alpine.js-3.x-green.svg)
 ![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3.x-blue.svg)
 ![License](https://img.shields.io/badge/license-MIT-green.svg)
@@ -267,7 +267,7 @@ noundry.ui/
 ## 🛠️ Development
 
 ### Prerequisites
-- .NET 8.0 SDK or later
+- .NET 8.0 or 9.0 SDK
 - Alpine.js 3.x (included via CDN)
 - Tailwind CSS 3.x (included via CDN)
 
