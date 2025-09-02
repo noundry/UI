@@ -45,35 +45,33 @@
                                      show-days-count="true"
                                      help-text="Select the start and end dates for your project" />
             
-            <noundry-select asp-for="ContactForm.Department" placeholder="Select department">
+            <!-- Server-side bound select with options collection -->
+            <noundry-select asp-for="ContactForm.Department" 
+                           placeholder="Select department"
+                           options-source="Model.Departments"
+                           options-value-property="Value"
+                           options-text-property="Text">
                 <noundry-option value="">-- Select Department --</noundry-option>
-                <noundry-option value="sales">Sales</noundry-option>
-                <noundry-option value="support">Technical Support</noundry-option>
-                <noundry-option value="billing">Billing</noundry-option>
-                <noundry-option value="general">General Inquiry</noundry-option>
             </noundry-select>
             
+            <!-- Server-side bound multi-select -->
             <noundry-select asp-for="ContactForm.InterestedServices" 
                            multiple="true" 
-                           placeholder="Select services of interest">
-                <noundry-option value="consulting">Consulting</noundry-option>
-                <noundry-option value="development">Development</noundry-option>
-                <noundry-option value="design">Design</noundry-option>
-                <noundry-option value="maintenance">Maintenance</noundry-option>
-            </noundry-select>
+                           placeholder="Select services of interest"
+                           options-source="Model.Services"
+                           options-value-property="Value"
+                           options-text-property="Text" />
             
+            <!-- Server-side bound multi-select with user collection -->
             <noundry-multi-select asp-for="ContactForm.TeamMembers" 
                                  label="Team Members"
                                  placeholder="Select team members"
-                                 help-text="Choose team members for this project"
+                                 help-text="Choose team members for this project (server-side options)"
                                  show-remove-buttons="true"
-                                 color="green">
-                <noundry-multi-select-option value="john" id="1">John Smith</noundry-multi-select-option>
-                <noundry-multi-select-option value="jane" id="2">Jane Doe</noundry-multi-select-option>
-                <noundry-multi-select-option value="bob" id="3">Bob Johnson</noundry-multi-select-option>
-                <noundry-multi-select-option value="alice" id="4">Alice Williams</noundry-multi-select-option>
-                <noundry-multi-select-option value="charlie" id="5">Charlie Brown</noundry-multi-select-option>
-            </noundry-multi-select>
+                                 color="green"
+                                 options-source="Model.Users"
+                                 options-value-property="Name"
+                                 options-text-property="Name" />
             
             <noundry-textarea asp-for="ContactForm.Message" 
                              rows="4" 

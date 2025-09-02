@@ -315,6 +315,71 @@ Dropdown selection with search capability.
     <noundry-option value="option1">Option 1</noundry-option>
     <noundry-option value="option2">Option 2</noundry-option>
 </noundry-select>
+
+<!-- Server-side bound select with collection -->
+<noundry-select asp-for="SelectedCountry" 
+                placeholder="Select country"
+                options-source="Model.Countries"
+                options-value-property="Value"
+                options-text-property="Text">
+    <noundry-option value="">-- Select Country --</noundry-option>
+</noundry-select>
+
+<!-- Server-side bound multi-select -->
+<noundry-select asp-for="SelectedServices" 
+                multiple="true"
+                placeholder="Select services"
+                options-source="Model.AvailableServices"
+                options-value-property="Id"
+                options-text-property="Name" />
+```
+
+#### Server-Side Option Binding
+
+Both `noundry-select` and `noundry-multi-select` support binding options from server-side collections:
+
+**PageModel Setup:**
+```csharp
+public class MyPageModel : PageModel
+{
+    [BindProperty]
+    public string SelectedCountry { get; set; } = "";
+    
+    [BindProperty]
+    public List<string> SelectedServices { get; set; } = new();
+    
+    public List<CountryOption> Countries { get; set; } = new();
+    public List<ServiceOption> AvailableServices { get; set; } = new();
+    
+    public void OnGet()
+    {
+        Countries = new List<CountryOption>
+        {
+            new CountryOption { Value = "us", Text = "United States" },
+            new CountryOption { Value = "uk", Text = "United Kingdom" },
+            new CountryOption { Value = "ca", Text = "Canada" }
+        };
+        
+        AvailableServices = new List<ServiceOption>
+        {
+            new ServiceOption { Id = "1", Name = "Consulting" },
+            new ServiceOption { Id = "2", Name = "Development" },
+            new ServiceOption { Id = "3", Name = "Support" }
+        };
+    }
+}
+
+public class CountryOption
+{
+    public string Value { get; set; } = "";
+    public string Text { get; set; } = "";
+}
+
+public class ServiceOption
+{
+    public string Id { get; set; } = "";
+    public string Name { get; set; } = "";
+}
 ```
 
 ### Data Table
@@ -1245,6 +1310,9 @@ Used for static data in data tables. No properties - acts as a container for cel
 | `api-url` | string | null | API endpoint URL for loading options |
 | `api-id-property` | string | "id" | Property name for option ID in API response |
 | `api-name-property` | string | "name" | Property name for option name in API response |
+| `options-source` | IEnumerable<object> | null | Server-side collection to bind options from |
+| `options-value-property` | string | "Value" | Property name for option value in the collection |
+| `options-text-property` | string | "Text" | Property name for option text in the collection |
 | `loading-text` | string | "Loading options..." | Text shown while loading API data |
 | `error-text` | string | "Failed to load options. Please try again." | Text shown when API fails |
 | `select-placeholder` | string | "Select options..." | Placeholder when no options selected |
@@ -1277,6 +1345,10 @@ Used for static data in data tables. No properties - acts as a container for cel
 | `searchable` | bool | false | Enable search functionality |
 | `search-placeholder` | string | "Search..." | Search input placeholder |
 | `no-results-text` | string | "No results found" | Text when no matches |
+| `options-source` | IEnumerable<object> | null | Server-side collection to bind options from |
+| `options-value-property` | string | "Value" | Property name for option value in the collection |
+| `options-text-property` | string | "Text" | Property name for option text in the collection |
+| `options-group-property` | string | null | Property name for option group (optional) |
 | `disabled` | bool | false | Disable the select |
 | `required` | bool | false | Mark as required |
 | `size` | string | "md" | Select size: sm, md, lg |

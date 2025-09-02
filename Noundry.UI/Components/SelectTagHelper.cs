@@ -37,6 +37,26 @@ public class SelectTagHelper : NoundryFormTagHelperBase
     /// </summary>
     public string MaxHeight { get; set; } = "max-h-60";
 
+    /// <summary>
+    /// Server-side collection to bind options from (e.g., Model.Countries)
+    /// </summary>
+    public IEnumerable<object>? OptionsSource { get; set; }
+
+    /// <summary>
+    /// Property name for option value in the options source collection
+    /// </summary>
+    public string OptionsValueProperty { get; set; } = "Value";
+
+    /// <summary>
+    /// Property name for option text in the options source collection  
+    /// </summary>
+    public string OptionsTextProperty { get; set; } = "Text";
+
+    /// <summary>
+    /// Property name for option group in the options source collection (optional)
+    /// </summary>
+    public string? OptionsGroupProperty { get; set; }
+
     public override async Task ProcessAsync(TagHelperContext context, TagHelperOutput output)
     {
         var selectContext = new SelectContext 
@@ -64,6 +84,12 @@ public class SelectTagHelper : NoundryFormTagHelperBase
 
         // Initialize options from child content
         await output.GetChildContentAsync();
+        
+        // Process server-side options collection if provided
+        if (OptionsSource != null)
+        {
+            ProcessServerSideOptions(selectContext);
+        }
         
         // Update Alpine data with options
         var optionsJs = string.Join(",", selectContext.Options.Select(opt => 
@@ -160,6 +186,48 @@ public class SelectTagHelper : NoundryFormTagHelperBase
                 @"<input type=""hidden"" :name=""selectSelected.map((val, index) => `" + context.InputName + @"[${index}]`).join(',')"" :value=""selectSelected.join(',')"" x-show=""selectSelected.length > 0"">" :
                 $@"<input type=""hidden"" name=""{context.InputName}"" :value=""selectSelected"">")}
             ";
+    }
+
+    private void ProcessServerSideOptions(SelectContext selectContext)
+    {
+        if (OptionsSource == null) return;
+
+        foreach (var item in OptionsSource)
+        {
+            if (item == null) continue;
+
+            var itemType = item.GetType();
+            
+            // Get value property
+            var valueProperty = itemType.GetProperty(OptionsValueProperty);
+            var value = valueProperty?.GetValue(item)?.ToString() ?? "";
+            
+            // Get text property  
+            var textProperty = itemType.GetProperty(OptionsTextProperty);
+            var text = textProperty?.GetValue(item)?.ToString() ?? value;
+            
+            // Check if this option should be selected based on current value
+            var isSelected = false;
+            if (AspFor?.Model != null)
+            {
+                if (Multiple && AspFor.Model is IEnumerable<string> selectedValues)
+                {
+                    isSelected = selectedValues.Contains(value);
+                }
+                else
+                {
+                    isSelected = AspFor.Model.ToString() == value;
+                }
+            }
+            
+            selectContext.Options.Add(new SelectOption
+            {
+                Value = value,
+                Text = text,
+                Selected = isSelected,
+                Disabled = false
+            });
+        }
     }
 }
 

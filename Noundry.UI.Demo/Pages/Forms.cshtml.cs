@@ -25,6 +25,11 @@ public class FormsModel : PageModel
     public int CurrentUserId { get; set; } = 123;
     public string TenantId { get; set; } = "tenant-456";
 
+    // Server-side option collections for select components
+    public List<CountryOption> Countries { get; set; } = new();
+    public List<DepartmentOption> Departments { get; set; } = new();
+    public List<ServiceOption> Services { get; set; } = new();
+
     public void OnGet()
     {
         // Initialize with sample data
@@ -47,6 +52,36 @@ public class FormsModel : PageModel
             new UserInfo { Id = 4, Name = "David Brown", Email = "david@example.com", Status = "Active", Role = "User", JoinDate = DateTime.Now.AddMonths(-8) },
             new UserInfo { Id = 5, Name = "Emma Davis", Email = "emma@example.com", Status = "Pending", Role = "User", JoinDate = DateTime.Now.AddDays(-15) },
             new UserInfo { Id = 6, Name = "Frank Wilson", Email = "frank@example.com", Status = "Active", Role = "User", JoinDate = DateTime.Now.AddMonths(-2) }
+        };
+
+        // Initialize server-side option collections
+        Countries = new List<CountryOption>
+        {
+            new CountryOption { Value = "us", Text = "United States" },
+            new CountryOption { Value = "uk", Text = "United Kingdom" },
+            new CountryOption { Value = "ca", Text = "Canada" },
+            new CountryOption { Value = "au", Text = "Australia" },
+            new CountryOption { Value = "de", Text = "Germany" },
+            new CountryOption { Value = "fr", Text = "France" }
+        };
+
+        Departments = new List<DepartmentOption>
+        {
+            new DepartmentOption { Value = "engineering", Text = "Engineering" },
+            new DepartmentOption { Value = "marketing", Text = "Marketing" },
+            new DepartmentOption { Value = "sales", Text = "Sales" },
+            new DepartmentOption { Value = "support", Text = "Customer Support" },
+            new DepartmentOption { Value = "hr", Text = "Human Resources" }
+        };
+
+        Services = new List<ServiceOption>
+        {
+            new ServiceOption { Value = "consulting", Text = "Consulting" },
+            new ServiceOption { Value = "development", Text = "Software Development" },
+            new ServiceOption { Value = "design", Text = "UI/UX Design" },
+            new ServiceOption { Value = "testing", Text = "Quality Assurance" },
+            new ServiceOption { Value = "devops", Text = "DevOps & Infrastructure" },
+            new ServiceOption { Value = "training", Text = "Training & Support" }
         };
     }
 
@@ -133,4 +168,22 @@ public class UserInfo
     public string Status { get; set; } = string.Empty;
     public string Role { get; set; } = string.Empty;
     public DateTime JoinDate { get; set; }
+}
+
+public class CountryOption
+{
+    public string Value { get; set; } = string.Empty;
+    public string Text { get; set; } = string.Empty;
+}
+
+public class DepartmentOption
+{
+    public string Value { get; set; } = string.Empty;
+    public string Text { get; set; } = string.Empty;
+}
+
+public class ServiceOption
+{
+    public string Value { get; set; } = string.Empty;
+    public string Text { get; set; } = string.Empty;
 }

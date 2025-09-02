@@ -87,6 +87,21 @@ public class MultiSelectTagHelper : NoundryFormTagHelperBase
     /// </summary>
     public new string? CssClass { get; set; }
 
+    /// <summary>
+    /// Server-side collection to bind options from (e.g., Model.Countries)
+    /// </summary>
+    public IEnumerable<object>? OptionsSource { get; set; }
+
+    /// <summary>
+    /// Property name for option value in the options source collection
+    /// </summary>
+    public string OptionsValueProperty { get; set; } = "Value";
+
+    /// <summary>
+    /// Property name for option text in the options source collection  
+    /// </summary>
+    public string OptionsTextProperty { get; set; } = "Text";
+
     public override async Task ProcessAsync(TagHelperContext context, TagHelperOutput output)
     {
         var multiSelectContext = new MultiSelectContext 
@@ -100,6 +115,12 @@ public class MultiSelectTagHelper : NoundryFormTagHelperBase
         context.Items[typeof(MultiSelectContext)] = multiSelectContext;
 
         var content = await output.GetChildContentAsync();
+        
+        // Process server-side options collection if provided
+        if (OptionsSource != null)
+        {
+            ProcessServerSideOptions(multiSelectContext);
+        }
         
         var inputId = GetInputId();
         var labelText = Label ?? GetDisplayName();
@@ -363,6 +384,48 @@ public class MultiSelectTagHelper : NoundryFormTagHelperBase
                 removeButton = "text-blue-400 hover:bg-blue-200 hover:text-blue-500"
             }
         };
+    }
+
+    private void ProcessServerSideOptions(MultiSelectContext multiSelectContext)
+    {
+        if (OptionsSource == null) return;
+
+        foreach (var item in OptionsSource)
+        {
+            if (item == null) continue;
+
+            var itemType = item.GetType();
+            
+            // Get value property
+            var valueProperty = itemType.GetProperty(OptionsValueProperty);
+            var value = valueProperty?.GetValue(item)?.ToString() ?? "";
+            
+            // Get text property  
+            var textProperty = itemType.GetProperty(OptionsTextProperty);
+            var text = textProperty?.GetValue(item)?.ToString() ?? value;
+            
+            // Check if this option should be selected based on current value
+            var isSelected = false;
+            if (AspFor?.Model != null)
+            {
+                if (AspFor.Model is IEnumerable<string> selectedValues)
+                {
+                    isSelected = selectedValues.Contains(value);
+                }
+                else if (AspFor.Model is string singleValue)
+                {
+                    isSelected = singleValue == value;
+                }
+            }
+            
+            multiSelectContext.Options.Add(new MultiSelectOption
+            {
+                Value = value,
+                Text = text,
+                Selected = isSelected,
+                Disabled = false
+            });
+        }
     }
 }
 
