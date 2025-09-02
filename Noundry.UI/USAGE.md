@@ -488,6 +488,209 @@ The `noundry-data-table-expandable-row` component adds slide-down functionality 
 </noundry-data-table>
 ```
 
+#### Complete Server-Side Model Binding Example
+
+Here's a comprehensive example showing how to use expandable rows with server-side collections and model data:
+
+**1. PageModel Setup:**
+```csharp
+public class OrdersPageModel : PageModel
+{
+    [BindProperty]
+    public List<OrderInfo> Orders { get; set; } = new();
+    
+    // Server-side properties for API arguments
+    public int CurrentUserId { get; set; }
+    public string CompanyId { get; set; } = string.Empty;
+    public string ApiToken { get; set; } = string.Empty;
+    
+    public void OnGet()
+    {
+        // Set server-side values from authentication/session
+        CurrentUserId = User.Identity.GetUserId(); // Your auth logic
+        CompanyId = User.GetCompanyId(); // Your company logic  
+        ApiToken = HttpContext.Session.GetString("ApiToken") ?? "";
+        
+        // Load your collection data
+        Orders = new List<OrderInfo>
+        {
+            new OrderInfo 
+            { 
+                Id = 1001, 
+                CustomerName = "Acme Corp", 
+                Status = "Pending", 
+                Total = 1250.00m,
+                OrderDate = DateTime.Now.AddDays(-3)
+            },
+            new OrderInfo 
+            { 
+                Id = 1002, 
+                CustomerName = "TechStart Inc", 
+                Status = "Shipped", 
+                Total = 890.50m,
+                OrderDate = DateTime.Now.AddDays(-7)
+            }
+        };
+    }
+}
+
+public class OrderInfo
+{
+    public int Id { get; set; }
+    public string CustomerName { get; set; } = string.Empty;
+    public string Status { get; set; } = string.Empty;
+    public decimal Total { get; set; }
+    public DateTime OrderDate { get; set; }
+    public string Priority { get; set; } = "Normal";
+}
+```
+
+**2. Razor View Implementation:**
+```html
+@page
+@model OrdersPageModel
+
+<div class="container mx-auto p-6">
+    <h1 class="text-2xl font-bold mb-6">Order Management</h1>
+    
+    <!-- Model-bound data table with expandable rows -->
+    <noundry-data-table asp-for="Orders" 
+                       title="Recent Orders" 
+                       show-search="true"
+                       show-pagination="true"
+                       per-page="10"
+                       hoverable="true">
+        
+        <!-- Standard columns -->
+        <noundry-data-table-column key="Id" label="Order #" sortable="true" />
+        <noundry-data-table-column key="CustomerName" label="Customer" sortable="true" />
+        <noundry-data-table-column key="Status" label="Status" sortable="true" />
+        <noundry-data-table-column key="Total" label="Total" sortable="true" />
+        <noundry-data-table-column key="OrderDate" label="Date" sortable="true" />
+        
+        <!-- Expandable row with server-side model data -->
+        <noundry-data-table-expandable-row 
+            api-url="/api/orders/{Id}/details"
+            button-text="Details"
+            api-parameters="includeTax=true&format=detailed"
+            server-arguments="userId=@Model.CurrentUserId&companyId=@Model.CompanyId&token=@Model.ApiToken"
+            loading-text="Loading order details..."
+            error-text="Failed to load order details"
+            container-class="bg-blue-50 border border-blue-200 rounded-lg p-4" />
+    </noundry-data-table>
+</div>
+```
+
+**3. API Controller for Expandable Content:**
+```csharp
+[ApiController]
+[Route("api/[controller]")]
+public class OrdersController : ControllerBase
+{
+    [HttpGet("{orderId}/details")]
+    public async Task<IActionResult> GetOrderDetails(
+        int orderId,
+        [FromQuery] bool includeTax = false,
+        [FromQuery] string format = "basic",
+        [FromQuery] int userId = 0,
+        [FromQuery] string companyId = "",
+        [FromQuery] string token = "")
+    {
+        // Validate server-side arguments
+        if (userId == 0 || string.IsNullOrEmpty(companyId) || string.IsNullOrEmpty(token))
+        {
+            return Unauthorized("Invalid authentication parameters");
+        }
+        
+        // Your business logic here
+        var orderDetails = await _orderService.GetOrderDetailsAsync(
+            orderId, userId, companyId, includeTax, format);
+            
+        // Return HTML content for the expandable row
+        var html = $@"
+            <div class=""space-y-4"">
+                <h3 class=""font-semibold text-lg"">Order #{orderDetails.Id} Details</h3>
+                
+                <div class=""grid grid-cols-2 gap-4"">
+                    <div>
+                        <span class=""font-medium"">Customer:</span>
+                        <span>{orderDetails.CustomerName}</span>
+                    </div>
+                    <div>
+                        <span class=""font-medium"">Priority:</span>
+                        <span class=""px-2 py-1 bg-yellow-100 text-yellow-800 rounded"">{orderDetails.Priority}</span>
+                    </div>
+                </div>
+                
+                <div class=""mt-4"">
+                    <h4 class=""font-medium mb-2"">Order Items:</h4>
+                    <ul class=""space-y-2"">
+                        {string.Join("", orderDetails.Items.Select(item => $@"
+                        <li class=""flex justify-between p-2 bg-white rounded border"">
+                            <span>{item.ProductName}</span>
+                            <span>${item.Price:F2}</span>
+                        </li>"))}
+                    </ul>
+                </div>
+                
+                {(includeTax ? $@"
+                <div class=""mt-4 p-3 bg-gray-100 rounded"">
+                    <div class=""flex justify-between"">
+                        <span>Subtotal:</span>
+                        <span>${orderDetails.Subtotal:F2}</span>
+                    </div>
+                    <div class=""flex justify-between"">
+                        <span>Tax:</span>
+                        <span>${orderDetails.Tax:F2}</span>
+                    </div>
+                    <div class=""flex justify-between font-bold border-t pt-2"">
+                        <span>Total:</span>
+                        <span>${orderDetails.Total:F2}</span>
+                    </div>
+                </div>
+                " : "")}
+            </div>";
+            
+        return Content(html, "text/html");
+    }
+}
+```
+
+**4. How the Parameters Flow:**
+
+When a user clicks the expand button on Order #1001:
+
+1. **Row Data**: `{Id: 1001, CustomerName: "Acme Corp", Status: "Pending", ...}`
+2. **API URL**: `/api/orders/{Id}/details` → `/api/orders/1001/details`
+3. **Client Parameters**: `includeTax=true&format=detailed`
+4. **Server Arguments**: `userId=123&companyId=company-abc&token=jwt-token-here`
+5. **Final URL**: `/api/orders/1001/details?includeTax=true&format=detailed&userId=123&companyId=company-abc&token=jwt-token-here`
+
+**5. Alternative: Icon-Only Expandable Rows:**
+```html
+<noundry-data-table-expandable-row 
+    api-url="/api/orders/{Id}/timeline"
+    show-as-icon="true"
+    server-arguments="userId=@Model.CurrentUserId&role=@Model.UserRole"
+    loading-text="Loading timeline..."
+    container-class="border-l-4 border-blue-500 pl-4" />
+```
+
+**6. Advanced Example with Nested Properties:**
+```html
+<!-- If your model has nested properties -->
+<noundry-data-table asp-for="Customers">
+    <noundry-data-table-column key="Profile.Name" label="Name" sortable="true" />
+    <noundry-data-table-column key="Contact.Email" label="Email" sortable="true" />
+    
+    <!-- Access nested properties in API URL -->
+    <noundry-data-table-expandable-row 
+        api-url="/api/customers/{Profile.CustomerId}/activity"
+        api-parameters="region={Contact.Region}&tier={Profile.Tier}"
+        server-arguments="requestedBy=@Model.CurrentUserId" />
+</noundry-data-table>
+```
+
 ### Multi-Select
 Advanced multi-selection component with API support and tag display.
 
