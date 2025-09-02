@@ -430,7 +430,9 @@ public class DataTableTagHelper : NoundryTagHelperBase
         if (context.ExpandableRow != null)
         {
             builder.AddProperty("expandedRows", "{}")
-                   .AddProperty("expandedContent", "{}");
+                   .AddProperty("expandedContent", "{}")
+                   .AddStringProperty("expandableApiUrl", context.ExpandableRow.ApiUrl)
+                   .AddStringProperty("expandableApiParameters", context.ExpandableRow.ApiParameters ?? "");
         }
 
         // Computed properties
@@ -568,19 +570,14 @@ public class DataTableTagHelper : NoundryTagHelperBase
                 this.expandedRows = {{ ...this.expandedRows, [index]: true }}; 
                 this.expandedContent = {{ ...this.expandedContent, [index]: 'loading' }}; 
                 try {{ 
-                    let apiUrl = '{EscapeJavaScriptString(context.ExpandableRow.ApiUrl)}';
-                    {(!string.IsNullOrEmpty(context.ExpandableRow.ApiParameters) ? $@"
-                    let parameters = '{EscapeJavaScriptString(context.ExpandableRow.ApiParameters)}';
-                    parameters = parameters.replace(/{{([^}}]+)}}/g, (match, key) => {{ 
-                        return this.getNestedValue(item, key) || ''; 
-                    }});
-                    if (parameters) {{ 
-                        apiUrl += (apiUrl.includes('?') ? '&' : '?') + parameters; 
+                    // Use the same formatHref method that works for column links
+                    let apiUrl = this.formatHref(this.expandableApiUrl, item);
+                    if (this.expandableApiParameters) {{ 
+                        let parameters = this.formatHref(this.expandableApiParameters, item);
+                        if (parameters) {{ 
+                            apiUrl += (apiUrl.includes('?') ? '&' : '?') + parameters; 
+                        }}
                     }}
-                    " : "")}
-                    apiUrl = apiUrl.replace(/{{([^}}]+)}}/g, (match, key) => {{ 
-                        return this.getNestedValue(item, key) || ''; 
-                    }});
                     const response = await fetch(apiUrl); 
                     if (!response.ok) {{ 
                         throw new Error(`HTTP error! Status: ${{response.status}}`); 
