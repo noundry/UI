@@ -11,7 +11,7 @@ A modern C# ASP.NET TagHelper library that provides server-side components with 
 ## ✨ Features
 
 - **🎯 62 UI Components** - Complete set of interactive components
-- **🔗 Full Model Binding** - Seamless ASP.NET model binding support  
+- **🔗 Full Model Binding** - Seamless ASP.NET model binding with server-side collections  
 - **♿ Accessibility Ready** - ARIA attributes and keyboard navigation
 - **🎨 Tailwind CSS Integration** - Beautiful, consistent styling
 - **⚡ Alpine.js Powered** - Lightweight client-side interactivity
@@ -55,8 +55,16 @@ builder.Services.AddNoundryUI(options =>
     <p>This modal works with Alpine.js integration!</p>
 </noundry-modal>
 
+<!-- Form controls with server-side model binding -->
 <noundry-text-input asp-for="Name" label="Full Name" icon="user" />
 <noundry-switch asp-for="EnableNotifications" label="Enable Notifications" />
+
+<!-- Server-side bound select from model collection -->
+<noundry-select asp-for="Country" 
+               placeholder="Select country"
+               options-source="Model.Countries"
+               options-value-property="Value"
+               options-text-property="Text" />
 ```
 
 ## 📖 Documentation
@@ -94,9 +102,9 @@ builder.Services.AddNoundryUI(options =>
 - **Radio Group** - Radio button groups with validation (2 TagHelpers)
 - **Date Picker** - Calendar-based date selection
 - **Date Range Picker** - Advanced date range selection with quick presets
-- **Select** - Advanced dropdown with search capability (2 TagHelpers)
+- **Select** - Advanced dropdown with server-side collection binding (2 TagHelpers)
 - **Combobox** - Searchable combo box selection (2 TagHelpers)
-- **Multi-Select** - Advanced multi-selection with API support (2 TagHelpers)
+- **Multi-Select** - Advanced multi-selection with server-side and API support (2 TagHelpers)
 
 ### Overlays & Modals (8 TagHelpers)
 - **Modal** - Dialog windows with backdrop
@@ -121,16 +129,28 @@ builder.Services.AddNoundryUI(options =>
 </noundry-alert>
 ```
 
-### Interactive Form with Toast Notifications
+### Interactive Form with Server-Side Model Binding
 ```html
 <form asp-action="Submit">
     <noundry-text-input asp-for="Name" label="Full Name" />
     <noundry-switch asp-for="Subscribe" label="Subscribe to Newsletter" />
-    <noundry-multi-select asp-for="Skills" label="Skills" color="green">
-        <noundry-multi-select-option value="csharp">C#</noundry-multi-select-option>
-        <noundry-multi-select-option value="javascript">JavaScript</noundry-multi-select-option>
-        <noundry-multi-select-option value="python">Python</noundry-multi-select-option>
-    </noundry-multi-select>
+    
+    <!-- Server-side bound select from model collection -->
+    <noundry-select asp-for="Country" 
+                   label="Country"
+                   placeholder="Select country"
+                   options-source="Model.Countries"
+                   options-value-property="Value"
+                   options-text-property="Text" />
+    
+    <!-- Server-side bound multi-select -->
+    <noundry-multi-select asp-for="Skills" 
+                         label="Skills" 
+                         color="green"
+                         options-source="Model.AvailableSkills"
+                         options-value-property="Id"
+                         options-text-property="Name" />
+                         
     <noundry-button type="submit" variant="primary" 
                    onclick="toast.success('Form submitted successfully!')">Submit</noundry-button>
 </form>
@@ -258,6 +278,38 @@ builder.Services.AddNoundryUI(options =>
         <noundry-data-table-cell key="role">User</noundry-data-table-cell>
     </noundry-data-table-row>
 </noundry-data-table>
+```
+
+### Server-Side Model Binding
+```html
+<!-- Complete form with server-side option binding -->
+@model ContactPageModel
+
+<form asp-action="Submit">
+    <noundry-text-input asp-for="ContactForm.Name" label="Full Name" />
+    
+    <!-- Server-side bound select -->
+    <noundry-select asp-for="ContactForm.Country"
+                   label="Country"
+                   placeholder="Select your country"
+                   options-source="Model.Countries"
+                   options-value-property="Value"
+                   options-text-property="Text" />
+
+    <!-- Server-side bound multi-select -->
+    <noundry-multi-select asp-for="ContactForm.Services"
+                         label="Services"
+                         placeholder="Select services"
+                         options-source="Model.AvailableServices"
+                         options-value-property="Id"
+                         options-text-property="Name"
+                         color="blue" />
+    
+    <noundry-button type="submit" variant="primary">Submit</noundry-button>
+</form>
+
+<!-- Toast notifications -->
+<noundry-toast-container />
 ```
 
 ## 🏗️ Project Structure

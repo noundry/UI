@@ -107,7 +107,7 @@ Before building forms, you might want to show loading states while data is being
 <noundry-skeleton-text lines="3" variable-width="true" />
 ```
 
-### 1. Create a Model
+### 1. Create a Model with Server-Side Options
 
 ```csharp
 public class ContactFormViewModel
@@ -126,34 +126,96 @@ public class ContactFormViewModel
 
     [Display(Name = "Preferred Contact Date")]
     public DateTime? ContactDate { get; set; }
+    
+    [Display(Name = "Country")]
+    public string Country { get; set; } = string.Empty;
+    
+    [Display(Name = "Interested Services")]
+    public List<string> InterestedServices { get; set; } = new();
+}
+
+// Page model with option collections
+public class ContactPageModel : PageModel
+{
+    [BindProperty]
+    public ContactFormViewModel ContactForm { get; set; } = new();
+    
+    public List<CountryOption> Countries { get; set; } = new();
+    public List<ServiceOption> Services { get; set; } = new();
+    
+    public void OnGet()
+    {
+        Countries = new List<CountryOption>
+        {
+            new CountryOption { Value = "us", Text = "United States" },
+            new CountryOption { Value = "uk", Text = "United Kingdom" },
+            new CountryOption { Value = "ca", Text = "Canada" }
+        };
+        
+        Services = new List<ServiceOption>
+        {
+            new ServiceOption { Value = "consulting", Text = "Consulting" },
+            new ServiceOption { Value = "development", Text = "Development" },
+            new ServiceOption { Value = "support", Text = "Support" }
+        };
+    }
+}
+
+public class CountryOption
+{
+    public string Value { get; set; } = string.Empty;
+    public string Text { get; set; } = string.Empty;
+}
+
+public class ServiceOption
+{
+    public string Value { get; set; } = string.Empty;
+    public string Text { get; set; } = string.Empty;
 }
 ```
 
-### 2. Create the Form View
+### 2. Create the Form View with Server-Side Binding
 
 ```html
-@model ContactFormViewModel
+@model ContactPageModel
 
 <div class="max-w-2xl mx-auto p-6">
     <h1 class="text-2xl font-bold mb-6">Contact Us</h1>
     
     <form asp-action="Contact" method="post" class="space-y-6">
         <!-- Name Input -->
-        <noundry-text-input asp-for="Name" 
+        <noundry-text-input asp-for="ContactForm.Name" 
                             icon="user" 
                             placeholder="Enter your full name" />
         
         <!-- Email Input -->
-        <noundry-text-input asp-for="Email" 
+        <noundry-text-input asp-for="ContactForm.Email" 
                             type="email" 
                             icon="email"
                             placeholder="your.email@example.com" />
         
+        <!-- Server-side bound country select -->
+        <noundry-select asp-for="ContactForm.Country"
+                       label="Country"
+                       placeholder="Select your country"
+                       options-source="Model.Countries"
+                       options-value-property="Value"
+                       options-text-property="Text" />
+        
+        <!-- Server-side bound services multi-select -->
+        <noundry-multi-select asp-for="ContactForm.InterestedServices"
+                             label="Services of Interest"
+                             placeholder="Select services"
+                             options-source="Model.Services"
+                             options-value-property="Value"
+                             options-text-property="Text"
+                             color="blue" />
+        
         <!-- Newsletter Switch -->
-        <noundry-switch asp-for="Subscribe" />
+        <noundry-switch asp-for="ContactForm.Subscribe" />
         
         <!-- Date Picker -->
-        <noundry-date-picker asp-for="ContactDate" 
+        <noundry-date-picker asp-for="ContactForm.ContactDate" 
                              placeholder="Select preferred date" />
         
         <!-- Submit Button -->
@@ -167,26 +229,65 @@ public class ContactFormViewModel
         </div>
     </form>
 </div>
+
+<!-- Toast notifications for feedback -->
+<noundry-toast-container position="top-right" />
 ```
 
-### 3. Handle the Form Submission
+### 3. Handle the Form Submission with Toast Notifications
 
 ```csharp
 [HttpPost]
-public async Task<IActionResult> Contact(ContactFormViewModel model)
+public async Task<IActionResult> OnPostAsync()
 {
     if (ModelState.IsValid)
     {
         // Process the form
-        TempData["Success"] = "Thank you! We'll be in touch soon.";
-        return RedirectToAction("Contact");
+        await _contactService.ProcessContactForm(ContactForm);
+        
+        // Set toast notification via TempData
+        TempData["ToastMessage"] = "Thank you! We'll be in touch soon.";
+        TempData["ToastType"] = "success";
+        
+        return RedirectToPage();
     }
     
-    return View(model);
+    // Reload option collections for redisplay
+    LoadOptionCollections();
+    return Page();
+}
+
+private void LoadOptionCollections()
+{
+    Countries = new List<CountryOption>
+    {
+        new CountryOption { Value = "us", Text = "United States" },
+        new CountryOption { Value = "uk", Text = "United Kingdom" },
+        new CountryOption { Value = "ca", Text = "Canada" }
+    };
+    
+    Services = new List<ServiceOption>
+    {
+        new ServiceOption { Value = "consulting", Text = "Consulting" },
+        new ServiceOption { Value = "development", Text = "Development" },
+        new ServiceOption { Value = "support", Text = "Support" }
+    };
 }
 ```
 
-## 🎨 Available Components (48 Total)
+**Add toast feedback to your view:**
+```html
+@if (TempData["ToastMessage"] != null)
+{
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            toast.show('@TempData["ToastMessage"]', '@(TempData["ToastType"] ?? "info")');
+        });
+    </script>
+}
+```
+
+## 🎨 Available Components (62 Total)
 
 ### Layout & Navigation (9 components)
 - **`<noundry-accordion>`** - Collapsible content sections
