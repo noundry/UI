@@ -21,6 +21,10 @@ public class FormsModel : PageModel
     [BindProperty]
     public List<UserInfo> Users { get; set; } = new();
 
+    // Server-side properties that can be used in expandable row arguments
+    public int CurrentUserId { get; set; } = 123;
+    public string TenantId { get; set; } = "tenant-456";
+
     public void OnGet()
     {
         // Initialize with sample data

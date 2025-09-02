@@ -210,6 +210,16 @@
             <noundry-data-table-column key="Status" label="Status" sortable="true" />
             <noundry-data-table-column key="Role" label="Role" sortable="true" />
             <noundry-data-table-column key="JoinDate" label="Join Date" sortable="true" />
+            
+            <!-- Expandable row with server-side model arguments -->
+            <noundry-data-table-expandable-row 
+                api-url="/api/users/{Id}/profile"
+                button-text="Profile"
+                api-parameters="includeActivity=true&limit=5"
+                server-arguments="currentUser=@Model.CurrentUserId&tenant=@Model.TenantId"
+                loading-text="Loading user profile..."
+                error-text="Failed to load profile data"
+                container-class="bg-gray-50 border border-gray-300 rounded" />
         </noundry-data-table>
     </div>
 </div>

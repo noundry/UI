@@ -473,6 +473,19 @@ The `noundry-data-table-expandable-row` component adds slide-down functionality 
     api-url="/api/reports/{id}/data"
     button-text="Show Report"
     container-class="bg-blue-50 border-2 border-blue-200 rounded-lg" />
+
+<!-- Model-bound table with server-side arguments -->
+<noundry-data-table asp-for="Users" title="Team Members">
+    <noundry-data-table-column key="Id" label="ID" sortable="true" />
+    <noundry-data-table-column key="Name" label="Name" sortable="true" />
+    
+    <!-- Server arguments evaluated from Razor model -->
+    <noundry-data-table-expandable-row 
+        api-url="/api/users/{Id}/profile"
+        api-parameters="includeActivity=true"
+        server-arguments="currentUser=@Model.CurrentUserId&tenant=@Model.TenantId"
+        button-text="Profile" />
+</noundry-data-table>
 ```
 
 ### Multi-Select
@@ -918,7 +931,8 @@ Used for static data in data tables. No properties - acts as a container for cel
 | `api-url` | string | required | API URL to fetch expanded content (supports placeholders like {id}, {name}) |
 | `button-text` | string | "View Details" | Text displayed on the expand button |
 | `button-icon` | string | "chevron-down" | Icon to display on the expand button (Heroicon name) |
-| `api-parameters` | string | null | Additional parameters to pass to API (supports placeholders) |
+| `api-parameters` | string | null | Client-side parameters from row data (supports placeholders like {id}, {status}) |
+| `server-arguments` | string | null | Server-side arguments from Razor model (e.g., "userId=@Model.UserId&tenant=@Model.TenantId") |
 | `show-as-icon` | bool | false | Whether to show only an icon instead of text button |
 | `loading-text` | string | "Loading..." | Text shown while loading expanded content |
 | `error-text` | string | "Error loading details" | Text shown when API call fails |

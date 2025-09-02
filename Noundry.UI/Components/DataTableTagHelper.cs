@@ -432,7 +432,8 @@ public class DataTableTagHelper : NoundryTagHelperBase
             builder.AddProperty("expandedRows", "{}")
                    .AddProperty("expandedContent", "{}")
                    .AddStringProperty("expandableApiUrl", context.ExpandableRow.ApiUrl)
-                   .AddStringProperty("expandableApiParameters", context.ExpandableRow.ApiParameters ?? "");
+                   .AddStringProperty("expandableApiParameters", context.ExpandableRow.ApiParameters ?? "")
+                   .AddStringProperty("expandableServerArguments", context.ExpandableRow.ServerArguments ?? "");
         }
 
         // Computed properties
@@ -572,12 +573,23 @@ public class DataTableTagHelper : NoundryTagHelperBase
                 try {{ 
                     // Use the same formatHref method that works for column links
                     let apiUrl = this.formatHref(this.expandableApiUrl, item);
+                    
+                    // Add client-side parameters from row data
                     if (this.expandableApiParameters) {{ 
                         let parameters = this.formatHref(this.expandableApiParameters, item);
                         if (parameters) {{ 
                             apiUrl += (apiUrl.includes('?') ? '&' : '?') + parameters; 
                         }}
                     }}
+                    
+                    // Add server-side arguments (pre-evaluated from Razor model)
+                    if (this.expandableServerArguments) {{ 
+                        const serverArgs = this.expandableServerArguments;
+                        if (serverArgs) {{ 
+                            apiUrl += (apiUrl.includes('?') ? '&' : '?') + serverArgs; 
+                        }}
+                    }}
+                    
                     const response = await fetch(apiUrl); 
                     if (!response.ok) {{ 
                         throw new Error(`HTTP error! Status: ${{response.status}}`); 
@@ -826,6 +838,7 @@ public class DataTableExpandableRow
     public string ButtonText { get; set; } = "View Details";
     public string ButtonIcon { get; set; } = "chevron-down";
     public string? ApiParameters { get; set; }
+    public string? ServerArguments { get; set; }
     public bool ShowAsIcon { get; set; } = false;
     public string LoadingText { get; set; } = "Loading...";
     public string ErrorText { get; set; } = "Error loading details";
@@ -854,6 +867,12 @@ public class DataTableExpandableRowTagHelper : NoundryTagHelperBase
     /// Additional parameters to pass to API (supports placeholders like {id}, {status}, etc.)
     /// </summary>
     public string? ApiParameters { get; set; }
+
+    /// <summary>
+    /// Server-side arguments to pass to the API (evaluated from Razor model)
+    /// Example: server-arguments="userId=@Model.CurrentUserId&tenant=@Model.TenantId"
+    /// </summary>
+    public string? ServerArguments { get; set; }
 
     /// <summary>
     /// Whether to show only an icon instead of text button
@@ -891,6 +910,7 @@ public class DataTableExpandableRowTagHelper : NoundryTagHelperBase
             ButtonText = ButtonText,
             ButtonIcon = ButtonIcon,
             ApiParameters = ApiParameters,
+            ServerArguments = ServerArguments,
             ShowAsIcon = ShowAsIcon,
             LoadingText = LoadingText,
             ErrorText = ErrorText,
