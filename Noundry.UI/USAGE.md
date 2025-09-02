@@ -399,35 +399,58 @@ Advanced data table with API support, pagination, sorting, and search.
     <noundry-data-table-column key="value" label="Value" />
 </noundry-data-table>
 
-<!-- Data table with expandable rows -->
-<noundry-data-table title="Users with Details" 
-                   api-url="/api/users"
+<!-- API data table with expandable rows -->
+<noundry-data-table title="Orders" 
+                   api-url="/api/orders"
                    per-page="10"
                    show-search="true">
-    <noundry-data-table-column key="id" label="ID" sortable="true" />
-    <noundry-data-table-column key="name" label="Name" sortable="true" />
-    <noundry-data-table-column key="email" label="Email" sortable="true" />
+    <noundry-data-table-column key="id" label="Order #" sortable="true" />
+    <noundry-data-table-column key="customer" label="Customer" sortable="true" />
+    <noundry-data-table-column key="status" label="Status" sortable="true" />
+    <noundry-data-table-column key="total" label="Total" sortable="true" />
     
-    <!-- Expandable row configuration -->
+    <!-- Expandable row with client and server parameters -->
     <noundry-data-table-expandable-row 
-        api-url="/api/users/{id}/details"
+        api-url="/api/orders/{id}/details"
         button-text="View Details"
-        loading-text="Loading user details..."
-        error-text="Failed to load details"
-        container-class="border border-gray-200" />
+        api-parameters="includeTax=true&format=detailed"
+        server-arguments="userId=@Model.CurrentUserId&companyId=@Model.CompanyId"
+        loading-text="Loading order details..."
+        error-text="Failed to load order details"
+        container-class="bg-blue-50 border border-blue-200 rounded-lg p-4" />
 </noundry-data-table>
 
-<!-- Icon-based expandable rows with API parameters -->
+<!-- Model-bound data table with expandable rows -->
+<noundry-data-table asp-for="Users" 
+                   title="Team Members"
+                   show-search="true">
+    <noundry-data-table-column key="Id" label="ID" sortable="true" />
+    <noundry-data-table-column key="Name" label="Name" sortable="true" />
+    <noundry-data-table-column key="Email" label="Email" sortable="true" />
+    
+    <!-- Server-side collection with expandable profiles -->
+    <noundry-data-table-expandable-row 
+        api-url="/api/users/{Id}/profile"
+        button-text="Profile"
+        api-parameters="includeActivity=true&format=detailed"
+        server-arguments="requesterId=@Model.CurrentUserId&tenantId=@Model.TenantId"
+        loading-text="Loading user profile..."
+        error-text="Failed to load profile" />
+</noundry-data-table>
+
+<!-- Icon-based expandable rows -->
 <noundry-data-table title="Posts with Comments" 
                    api-url="/api/posts">
     <noundry-data-table-column key="id" label="ID" sortable="true" />
     <noundry-data-table-column key="title" label="Title" sortable="true" />
+    <noundry-data-table-column key="userId" label="Author ID" sortable="true" />
     
-    <!-- Icon-only expand button with API parameters -->
+    <!-- Icon-only expand button -->
     <noundry-data-table-expandable-row 
         api-url="/api/posts/{id}/comments"
         show-as-icon="true"
         api-parameters="limit=5&include=author"
+        server-arguments="moderatorId=@Model.CurrentUserId"
         loading-text="Loading comments..."
         error-text="Failed to load comments" />
 </noundry-data-table>

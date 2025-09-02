@@ -274,6 +274,25 @@ builder.Services.AddNoundryUI(options =>
 </noundry-select>
 ```
 
+#### Interactive Data Tables with Expandable Details
+```html
+<!-- Model-bound data table with server-side collection -->
+<noundry-data-table asp-for="Orders" 
+                   title="Recent Orders"
+                   show-search="true"
+                   per-page="10">
+    <noundry-data-table-column key="Id" label="Order #" sortable="true" />
+    <noundry-data-table-column key="Customer" label="Customer" sortable="true" />
+    <noundry-data-table-column key="Status" label="Status" sortable="true" />
+    
+    <!-- Expandable rows with model binding -->
+    <noundry-data-table-expandable-row 
+        api-url="/api/orders/{Id}/details"
+        button-text="View Items"
+        server-arguments="userId=@Model.CurrentUserId&companyId=@Model.CompanyId" />
+</noundry-data-table>
+```
+
 #### Interactive Dashboards
 ```html
 <noundry-accordion>

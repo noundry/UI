@@ -194,7 +194,8 @@
         <h2 class="text-xl font-semibold mb-6">Model-Bound Data Table</h2>
         <p class="text-gray-600 mb-4">
             This data table is bound to a collection in the page model and demonstrates client-side sorting, 
-            search, and pagination with strongly-typed data.
+            search, and pagination with strongly-typed data. Click "Profile" to see expandable row functionality
+            with both client-side row data and server-side model arguments.
         </p>
         
         <noundry-data-table asp-for="Users" 
@@ -211,15 +212,15 @@
             <noundry-data-table-column key="Role" label="Role" sortable="true" />
             <noundry-data-table-column key="JoinDate" label="Join Date" sortable="true" />
             
-            <!-- Expandable row with server-side model arguments -->
+            <!-- Expandable row demonstrating model binding with server arguments -->
             <noundry-data-table-expandable-row 
-                api-url="/api/users/{Id}/profile"
-                button-text="Profile"
-                api-parameters="includeActivity=true&limit=5"
-                server-arguments="currentUser=@Model.CurrentUserId&tenant=@Model.TenantId"
-                loading-text="Loading user profile..."
-                error-text="Failed to load profile data"
-                container-class="bg-gray-50 border border-gray-300 rounded" />
+                api-url="https://jsonplaceholder.typicode.com/users/{Id}/posts"
+                button-text="View Posts"
+                api-parameters="limit=3&fields=title,body"
+                server-arguments="requesterId=@Model.CurrentUserId&tenantId=@Model.TenantId&timestamp=@DateTime.Now.Ticks"
+                loading-text="Loading user posts..."
+                error-text="Failed to load posts data"
+                container-class="bg-indigo-50 border border-indigo-200 rounded-lg p-4 shadow-sm" />
         </noundry-data-table>
     </div>
 </div>

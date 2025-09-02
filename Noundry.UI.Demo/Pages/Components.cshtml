@@ -276,51 +276,54 @@
         <div class="mt-6">
             <h3 class="text-lg font-medium mb-3">Data Table with Expandable Rows</h3>
             <p class="text-sm text-gray-600 mb-4">
-                Click the expand button on each row to load additional details from the API. The expanded content slides down smoothly with a fade animation.
+                Click the expand button on each row to load additional details from the API. The expanded content slides down smoothly with x-collapse animation.
+                This example shows both client-side parameters (from row data) and server-side arguments (from the model).
             </p>
-            <noundry-data-table title="Users with Expandable Details" 
+            <noundry-data-table title="Users with Expandable Profiles" 
                                api-url="https://jsonplaceholder.typicode.com/users"
-                               per-page="5"
+                               per-page="4"
                                show-search="true"
                                show-pagination="true"
                                hoverable="true">
                 <noundry-data-table-column key="id" label="ID" sortable="true" />
                 <noundry-data-table-column key="name" label="Name" sortable="true" />
                 <noundry-data-table-column key="email" label="Email" sortable="true" />
-                <noundry-data-table-column key="username" label="Username" sortable="true" />
+                <noundry-data-table-column key="website" label="Website" sortable="true" />
                 
-                <!-- Expandable row configuration -->
+                <!-- Expandable row with comprehensive configuration -->
                 <noundry-data-table-expandable-row 
                     api-url="https://jsonplaceholder.typicode.com/users/{id}/albums"
-                    button-text="Albums"
-                    show-as-icon="false"
+                    button-text="View Albums"
+                    api-parameters="limit=5&sortBy=title"
                     loading-text="Loading user albums..."
-                    error-text="Failed to load albums"
-                    container-class="border border-blue-200" />
+                    error-text="Failed to load albums. Please try again."
+                    container-class="bg-blue-50 border border-blue-200 rounded-lg p-4" />
             </noundry-data-table>
         </div>
         
         <div class="mt-6">
             <h3 class="text-lg font-medium mb-3">Data Table with Icon Expandable Rows</h3>
             <p class="text-sm text-gray-600 mb-4">
-                This example uses icon-only expand buttons and includes API parameters.
+                This example uses icon-only expand buttons with minimal UI. Perfect for compact layouts where space is limited.
+                Shows how to combine API parameters with nested data access.
             </p>
-            <noundry-data-table title="Posts with Comments" 
+            <noundry-data-table title="Posts with Comment Preview" 
                                api-url="https://jsonplaceholder.typicode.com/posts"
                                per-page="3"
                                show-search="true"
                                hoverable="true">
                 <noundry-data-table-column key="id" label="ID" sortable="true" />
                 <noundry-data-table-column key="title" label="Title" sortable="true" />
-                <noundry-data-table-column key="userId" label="User ID" sortable="true" />
+                <noundry-data-table-column key="userId" label="Author" sortable="true" />
                 
-                <!-- Icon-based expandable row with API parameters -->
+                <!-- Compact icon-based expandable row -->
                 <noundry-data-table-expandable-row 
                     api-url="https://jsonplaceholder.typicode.com/posts/{id}/comments"
                     show-as-icon="true"
-                    api-parameters="limit=3"
+                    api-parameters="limit=3&fields=name,email,body"
                     loading-text="Loading comments..."
-                    error-text="Failed to load comments" />
+                    error-text="Unable to load comments"
+                    container-class="border-l-4 border-green-400 bg-green-50 p-3" />
             </noundry-data-table>
         </div>
     </div>

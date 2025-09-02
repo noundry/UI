@@ -191,27 +191,29 @@ builder.Services.AddNoundryUI(options =>
 </noundry-skeleton-container>
 ```
 
-### Advanced Data Table
+### Advanced Data Table with Expandable Rows
 ```html
-<!-- API-powered data table -->
-<noundry-data-table title="Users" 
-                   api-url="/api/users"
+<!-- API-powered data table with expandable details -->
+<noundry-data-table title="Orders" 
+                   api-url="/api/orders"
                    per-page="10"
-                   server-pagination="true"
                    show-search="true">
-    <noundry-data-table-column key="id" label="ID" sortable="true" />
-    <noundry-data-table-column key="name" label="Name" sortable="true" href="/users/{id}" />
-    <noundry-data-table-column key="email" label="Email" sortable="true" />
-    <noundry-data-table-column key="role" label="Role" sortable="false" />
+    <noundry-data-table-column key="id" label="Order #" sortable="true" />
+    <noundry-data-table-column key="customer" label="Customer" sortable="true" />
+    <noundry-data-table-column key="status" label="Status" sortable="true" />
+    <noundry-data-table-column key="total" label="Total" sortable="true" />
     
     <!-- Expandable rows with slide-down animation -->
     <noundry-data-table-expandable-row 
-        api-url="/api/users/{id}/details"
+        api-url="/api/orders/{id}/details"
         button-text="View Details"
-        api-parameters="include=profile,settings" />
+        api-parameters="includeTax=true&format=detailed"
+        server-arguments="userId=@Model.CurrentUserId&companyId=@Model.CompanyId"
+        loading-text="Loading order details..."
+        container-class="bg-gray-50 border border-gray-200 rounded-lg p-4" />
 </noundry-data-table>
 
-<!-- Model-bound data table -->
+<!-- Model-bound data table with expandable rows -->
 <noundry-data-table asp-for="Users" 
                    title="Team Members"
                    show-search="true"
@@ -221,6 +223,13 @@ builder.Services.AddNoundryUI(options =>
     <noundry-data-table-column key="Name" label="Name" sortable="true" href="/users/{Id}" />
     <noundry-data-table-column key="Email" label="Email" sortable="true" />
     <noundry-data-table-column key="Status" label="Status" sortable="true" />
+    
+    <!-- Server-side model binding with client-side data -->
+    <noundry-data-table-expandable-row 
+        api-url="/api/users/{Id}/profile"
+        button-text="Profile"
+        api-parameters="includeActivity=true"
+        server-arguments="requesterId=@Model.CurrentUserId&tenantId=@Model.TenantId" />
 </noundry-data-table>
 
 <!-- Static data table with client-side features -->
