@@ -10,7 +10,7 @@ A modern C# ASP.NET TagHelper library that provides server-side components with 
 
 ## ✨ Features
 
-- **🎯 63 UI Components** - Complete set of interactive components
+- **🎯 64 UI Components** - Complete set of interactive components
 - **🔗 Full Model Binding** - Seamless ASP.NET model binding support  
 - **♿ Accessibility Ready** - ARIA attributes and keyboard navigation
 - **🎨 Tailwind CSS Integration** - Beautiful, consistent styling
@@ -76,10 +76,11 @@ builder.Services.AddNoundryUI(options =>
 - **Context Menu** - Right-click context menus (2 TagHelpers)
 - **Command** - Advanced command palette with search (3 TagHelpers)
 
-### Feedback & Status (8 TagHelpers)
+### Feedback & Status (9 TagHelpers)
 - **Alert** - Notification messages with dismiss functionality
 - **Badge** - Status indicators and labels
 - **Toast** - Temporary notification messages
+- **Toast Container** - Advanced toast system with global API and animations
 - **Banner** - Dismissible notification banners
 - **Progress** - Progress bars with animation
 - **Rating** - Interactive star rating system
@@ -103,7 +104,7 @@ builder.Services.AddNoundryUI(options =>
 - **Tooltip** - Hover information display
 - **Popover** - Click-activated content overlay
 
-### Data Display (24 TagHelpers)
+### Data Display (25 TagHelpers)
 - **Card** - Content containers with header/body/footer (4 TagHelpers)
 - **Table** - Data tables with sorting and responsive design (6 TagHelpers)
 - **Data Table** - Advanced data tables with API, pagination, sorting, expandable rows (5 TagHelpers)
@@ -120,7 +121,7 @@ builder.Services.AddNoundryUI(options =>
 </noundry-alert>
 ```
 
-### Interactive Form
+### Interactive Form with Toast Notifications
 ```html
 <form asp-action="Submit">
     <noundry-text-input asp-for="Name" label="Full Name" />
@@ -130,8 +131,12 @@ builder.Services.AddNoundryUI(options =>
         <noundry-multi-select-option value="javascript">JavaScript</noundry-multi-select-option>
         <noundry-multi-select-option value="python">Python</noundry-multi-select-option>
     </noundry-multi-select>
-    <noundry-button type="submit" variant="primary">Submit</noundry-button>
+    <noundry-button type="submit" variant="primary" 
+                   onclick="toast.success('Form submitted successfully!')">Submit</noundry-button>
 </form>
+
+<!-- Advanced toast notification system -->
+<noundry-toast-container position="top-right" default-duration="4000" />
 ```
 
 ### Complex Modal

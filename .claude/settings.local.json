@@ -16,7 +16,8 @@
       "Read(/C:\\temp/**)",
       "Bash(chmod:*)",
       "Bash(git log:*)",
-      "WebFetch(domain:jsonplaceholder.typicode.com)"
+      "WebFetch(domain:jsonplaceholder.typicode.com)",
+      "Read(C:\\Temp/**)"
     ],
     "deny": [],
     "ask": []

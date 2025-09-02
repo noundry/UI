@@ -36,6 +36,63 @@
         </div>
     </div>
 
+    <!-- Toast Notifications -->
+    <div class="bg-white p-6 rounded-lg shadow">
+        <h2 class="text-xl font-semibold mb-4">Toast Notifications</h2>
+        <p class="text-gray-600 mb-6">
+            Advanced toast notification system with slide animations, progress bars, and global API. 
+            Click the buttons below to see different toast types in action.
+        </p>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+            <button 
+                onclick="toast.success('Operation completed successfully!')" 
+                class="py-3 px-4 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-lg hover:from-green-600 hover:to-green-700 transition-all duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-0.5 font-medium">
+                Success Toast
+            </button>
+            
+            <button 
+                onclick="toast.error('Something went wrong. Please try again.')" 
+                class="py-3 px-4 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-lg hover:from-red-600 hover:to-red-700 transition-all duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-0.5 font-medium">
+                Error Toast
+            </button>
+            
+            <button 
+                onclick="toast.info('New update available. Check it out!')" 
+                class="py-3 px-4 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg hover:from-blue-600 hover:to-blue-700 transition-all duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-0.5 font-medium">
+                Info Toast
+            </button>
+            
+            <button 
+                onclick="toast.warning('Your session will expire soon.')" 
+                class="py-3 px-4 bg-gradient-to-r from-yellow-500 to-yellow-600 text-white rounded-lg hover:from-yellow-600 hover:to-yellow-700 transition-all duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-0.5 font-medium">
+                Warning Toast
+            </button>
+        </div>
+        
+        <div class="bg-gray-50 p-4 rounded-lg border border-gray-200">
+            <label class="block text-sm font-medium text-gray-700 mb-2">Custom Toast</label>
+            <div class="flex space-x-3">
+                <input 
+                    type="text" 
+                    id="customToastMessage" 
+                    class="flex-1 border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200" 
+                    placeholder="Enter your custom message"
+                    value="This is a custom toast message!"
+                >
+                <button 
+                    onclick="toast.show(document.getElementById('customToastMessage').value, 'default', 5000)" 
+                    class="py-3 px-6 bg-gradient-to-r from-purple-500 to-purple-600 text-white rounded-lg hover:from-purple-600 hover:to-purple-700 transition-all duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-0.5 font-medium">
+                    Show Toast
+                </button>
+            </div>
+            <p class="text-xs text-gray-500 mt-2">This custom toast will display for 5 seconds</p>
+        </div>
+        
+        <!-- Toast Container Component -->
+        <noundry-toast-container position="top-right" default-duration="3000" />
+    </div>
+
     <!-- Buttons & Badges -->
     <div class="bg-white p-6 rounded-lg shadow">
         <h2 class="text-xl font-semibold mb-4">Buttons & Badges</h2>

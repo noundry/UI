@@ -795,6 +795,78 @@ Temporary notification messages.
 </noundry-toast>
 ```
 
+### Toast Container
+Advanced toast notification system with slide animations, progress bars, and global API.
+
+```html
+<!-- Basic toast container -->
+<noundry-toast-container />
+
+<!-- Custom positioned container -->
+<noundry-toast-container position="top-left" default-duration="5000" />
+
+<!-- Container with sound support -->
+<noundry-toast-container position="bottom-right" enable-sound="true" max-width="max-w-md" />
+```
+
+#### Usage with Global API
+
+Once you add the toast container to your page, you can use the global `toast` API from anywhere:
+
+```javascript
+// Basic usage
+toast.show('Hello World!', 'success');
+
+// Convenience methods
+toast.success('Operation completed!');
+toast.error('Something went wrong');
+toast.info('New notification');
+toast.warning('Warning message');
+
+// Custom duration
+toast.show('This stays for 10 seconds', 'info', 10000);
+
+// With sound (if enabled)
+toast.show('Message with sound', 'success', 3000, { sound: '/audio/notification.mp3' });
+```
+
+#### Server-Side Integration
+
+```csharp
+// In your controller or page model
+public IActionResult SaveData()
+{
+    try 
+    {
+        // Your business logic
+        _dataService.Save(data);
+        
+        // Return success with toast
+        TempData["ToastMessage"] = "Data saved successfully!";
+        TempData["ToastType"] = "success";
+        return RedirectToAction("Index");
+    }
+    catch (Exception ex)
+    {
+        TempData["ToastMessage"] = "Failed to save data";
+        TempData["ToastType"] = "error";
+        return View();
+    }
+}
+```
+
+```html
+<!-- In your Razor view -->
+@if (TempData["ToastMessage"] != null)
+{
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            toast.show('@TempData["ToastMessage"]', '@(TempData["ToastType"] ?? "info")');
+        });
+    </script>
+}
+```
+
 ### Dropdown Menu
 Context menus and user menus.
 
@@ -1228,6 +1300,16 @@ Used for static data in data tables. No properties - acts as a container for cel
 | `auto-dismiss` | bool | true | Auto dismiss after delay |
 | `delay` | int | 5000 | Auto dismiss delay (ms) |
 | `css-class` | string | null | Additional CSS classes |
+
+### Toast Container (`noundry-toast-container`)
+| Property | Type | Default | Description |
+|----------|------|---------|-------------|
+| `position` | string | "top-right" | Container position: top-right, top-left, bottom-right, bottom-left, top-center, bottom-center |
+| `max-width` | string | "max-w-sm" | Maximum width of the toast container |
+| `z-index` | string | "z-50" | Z-index for layering |
+| `enable-sound` | bool | false | Whether to enable sound support for toasts |
+| `default-duration` | int | 3000 | Default duration for toasts in milliseconds |
+| `css-class` | string | null | Additional CSS classes for the container |
 
 ### Dropdown Menu (`noundry-dropdown-menu`)
 | Property | Type | Default | Description |
